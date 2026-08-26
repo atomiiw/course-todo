@@ -19,7 +19,7 @@ Two artifacts, both inside the user's Obsidian folder:
 Ship only when ALL hold — otherwise say what's missing in chat:
 
 1. One new batch section exists in `todo.md`; every other line of the file is byte-identical to before.
-2. Every deliverable due in the window appears under Submit with its real deadline, verified against the source (LMS/site), not assumed from a syllabus.
+2. Every deliverable due in the window appears under Submit with its real deadline, verified against the source (LMS/site), not assumed from a syllabus. All Canvas deadline channels were swept — assignments, quizzes, calendar events, modules, announcements (see Enumerate); channels no API can reach were named in chat, not silently skipped.
 3. Every `[name](资料/…)` link resolves to a file that passed integrity checks.
 4. Anything that could not be fetched is reported in chat with the reason — never silently dropped, never written into the file as a caveat.
 
@@ -31,7 +31,14 @@ Ship only when ALL hold — otherwise say what's missing in chat:
 ## The pipeline (in order, no skipping)
 
 1. **Map**: read the overview note. List each course's sources: Canvas course id, professor site, submission portal.
-2. **Enumerate**: for each course, pull what's due in the window — `list_assignments`, `api_get("/courses/:id/modules?include[]=items")`, course files, announcements, and `fetch` the professor site. A course with no Canvas assignments usually posts homework as files and collects it elsewhere (Gradescope) — check both.
+2. **Enumerate** — for each course, sweep EVERY deadline channel, not just assignments (a due date can live in any one of these and nowhere else):
+   - `list_assignments` — Canvas assignments with due dates
+   - `api_get("/courses/:id/quizzes?per_page=100")` — **quizzes are a separate endpoint**; `due_at`/`lock_at` here never show up in assignments
+   - `api_get("/courses/:id/calendar_events?...&per_page=100")` and `api_get("/users/self/calendar_events?type=assignment...")` — one-off events, moved dates
+   - `api_get("/courses/:id/modules?include[]=items")` + course files — new/updated PDFs
+   - `announcements` — a prof pushing a date change or dropping a file on a whim
+   - `fetch` the professor site — courses with no Canvas assignments (submission on Gradescope) post the real schedule here
+   Anything with a `due_at`/`lock_at` inside the window goes into Submit. Not covered by any API — Gradescope, Ed/Piazza, Slack, and anything said aloud in a lecture: name them in the chat report so the user checks them manually.
 3. **Collect** (rules under 资料 below): download every file a batch item references.
 4. **Write**: append the batch to `todo.md` per the format contract below.
 5. **Report** in chat: what was downloaded (sizes/page counts, so a bad file is spottable), what wasn't and why, plus anything that belongs in chat instead of the file (attendance-only events, upcoming cookie expiry).

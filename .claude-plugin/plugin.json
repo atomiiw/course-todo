@@ -1,6 +1,6 @@
 {
   "name": "course-todo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cumulative course to-do list in your Obsidian vault, built from Canvas and professor course sites — downloads every reachable PDF into a materials folder and links it. Ships a cookie-auth read-only Canvas MCP server.",
   "author": { "name": "atomiiw", "url": "https://github.com/atomiiw" },
   "mcpServers": {
