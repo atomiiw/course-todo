@@ -1,0 +1,11 @@
+{
+  "name": "atomiiw",
+  "owner": { "name": "atomiiw", "url": "https://github.com/atomiiw" },
+  "plugins": [
+    {
+      "name": "course-todo",
+      "source": "./",
+      "description": "Cumulative course to-do list in your Obsidian vault from Canvas + professor sites, with verified PDF downloads and a bundled cookie-auth Canvas MCP."
+    }
+  ]
+}
