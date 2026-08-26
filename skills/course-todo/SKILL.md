@@ -1,44 +1,66 @@
 ---
 name: course-todo
-description: Build or extend a cumulative course to-do list (todo.md) in an Obsidian folder from Canvas LMS and professor course sites, downloading every reachable course PDF into a 资料 subfolder. Use when the user asks to update their course todo, plan homework for a date range, or collect course materials. Inputs: the Obsidian folder, and the date range to cover.
+description: Turn Canvas + professor course sites into a cumulative, ADHD-friendly todo.md inside an Obsidian folder, with every reachable course file downloaded, verified, and locally linked. Use when the user asks to update their course todo, plan schoolwork through a date, or collect course materials. Inputs: the Obsidian folder and the end date of the range.
 ---
 
 # Course Todo
 
-Maintain two things inside the user's chosen Obsidian folder:
+You maintain one deliverable for a student who skips lectures: open `todo.md`, and everything needed to survive the next deadline window is one click away — the assignment, the exact material that teaches it, and where to submit. No LMS spelunking, no dead links, no half-downloaded PDFs.
 
-1. `todo.md` — a cumulative, batched to-do list (one batch per request).
-2. `资料/` — a flat folder of downloaded course materials that `todo.md` links to.
+Two artifacts, both inside the user's Obsidian folder:
 
-## Inputs
+| Artifact | What it is |
+|---|---|
+| `todo.md` | Cumulative batches of Study + Submit checkboxes. One batch per request. Old batches are never touched — the user's checkmarks live there. |
+| `资料/` | Flat folder of downloaded materials that `todo.md` links to. |
 
-Ask only if not given:
-- **Obsidian folder** — absolute path. Expect a course-overview note in it (course names, numbers, Canvas course ids, Gradescope/site links, grading, calendar). Read it first; it is the source of truth for where things are submitted and when.
-- **Date range** — "update me through <date>". The new batch covers today through that date.
+## Definition of done
 
-## Data collection (via the bundled canvas MCP)
+Ship only when ALL hold — otherwise say what's missing in chat:
 
-The plugin ships an MCP server (`canvas`) whose auth is the user's own browser session cookies, stored locally on the user's machine, read-only access to their own course data. Tools: `set_cookie(domain?, cookie)`, `which_cookies()`, `download(url, out_path)`, `fetch(url)`, plus Canvas helpers `list_courses`, `course_tabs`, `list_folders`, `list_files`, `list_assignments`, `announcements`, `list_pages`, `get_page`, `api_get(path)`. Set `CANVAS_HOST` env if the school is not canvas.duke.edu.
+1. One new batch section exists in `todo.md`; every other line of the file is byte-identical to before.
+2. Every deliverable due in the window appears under Submit with its real deadline, verified against the source (LMS/site), not assumed from a syllabus.
+3. Every `[name](资料/…)` link resolves to a file that passed integrity checks.
+4. Anything that could not be fetched is reported in chat with the reason — never silently dropped, never written into the file as a caveat.
 
-Rules learned the hard way:
+## Inputs — settle before touching anything
 
-- **Try stored cookies first.** Only ask the user for a cookie when a tool errors with cookie missing/expired. Then walk them through it with these instructions verbatim:
-  > Open the page in Chrome and log in → press F12 → go to the **Network tab** (not "view source") → refresh the page → click the top request of type *document* → under **Request Headers**, copy the entire `cookie:` line's value → paste it back to me.
-  Then call `set_cookie(domain, cookie)`. Canvas cookies last days; Shibboleth/SSO cookies for professor sites last only hours — expect to re-ask. The session cookie is a credential: it goes only into `set_cookie`, never into any file you produce, never into chat output.
-- Many courses close the **Files** tab to students (unauthorized) → go through **Modules** (`api_get("/courses/:id/modules?include[]=items")`) or **Assignments** instead; a module file item's API URL must be GET once more to obtain the real `.url` download link. Some courses close Pages too.
-- Course content often lives OUTSIDE Canvas on a professor's public site — `fetch` the site, harvest links. Google Docs export as PDF via `https://docs.google.com/document/d/<id>/export?format=pdf`.
-- Lecture recordings (Panopto/Zoom) are unreachable via API — they stay hyperlinks.
+- **Obsidian folder** (absolute path). It must contain a course-overview note (course numbers, LMS course ids, submission-portal links, schedule). That note is the map: read it first, trust it for *where things are submitted*; trust the live LMS for *what is due when*. No overview note → ask the user for one; do not guess course ids.
+- **End date** — the new batch covers today through that date.
 
-## 资料: the materials folder
+## The pipeline (in order, no skipping)
 
-**Download every reachable PDF/file the batch needs — Canvas files AND professor-site files.** Only truly gated things (SSO-blocked pages you have no cookie for, videos, submission portals) stay as web hyperlinks.
+1. **Map**: read the overview note. List each course's sources: Canvas course id, professor site, submission portal.
+2. **Enumerate**: for each course, pull what's due in the window — `list_assignments`, `api_get("/courses/:id/modules?include[]=items")`, course files, announcements, and `fetch` the professor site. A course with no Canvas assignments usually posts homework as files and collects it elsewhere (Gradescope) — check both.
+3. **Collect** (rules under 资料 below): download every file a batch item references.
+4. **Write**: append the batch to `todo.md` per the format contract below.
+5. **Report** in chat: what was downloaded (sizes/page counts, so a bad file is spottable), what wasn't and why, plus anything that belongs in chat instead of the file (attendance-only events, upcoming cookie expiry).
 
-- Naming: `<courseNumber>_<Category><NN?>_<Name?>.<ext>` — e.g. `270_HW1.pdf`, `350_Slides01_Intro.pdf`, `350_SlidesAll_Spring2024.pdf`, `270_Notes_TransmissionLines.pdf`, `350_Setup_Git.pdf`, `662_Slides_CL01.pdf`, `662_Syllabus.pdf`, `371_Assign0_notebook.ipynb`, `350_PracticeMidterm1_Spring2023.pdf`, `270L_Lab1.pdf`. Categories in use: HW, Assign, Slides, SlidesAll, Notes, Setup, Lab, Syllabus, PracticeMidterm, FinalProject.
-- **Never write a download straight into 资料.** Download to a temp dir, verify (correct MIME type; PDFs end with `%%EOF`; size matches Content-Length — the MCP `download` enforces length), then copy in. A truncated PDF opens blank; a blind re-download over a good file can clobber it with a login page.
+## Auth playbook
 
-## todo.md: exact format
+The bundled `canvas` MCP authenticates with the user's own browser session cookies (`set_cookie(domain?, cookie)`, stored under `~/.canvas-mcp/cookies/`, mode 600, read-only access). Non-Duke schools: set `CANVAS_HOST`.
 
-Cumulative: each request appends a new batch section under the single `# TODO` title, **newest batch first**. Never rewrite old batches; the user checks boxes in them.
+- **Never ask for a cookie preemptively.** Use stored cookies; only when a tool errors "cookie missing/expired for <host>" do you deliver this script, verbatim:
+  > Open the page in Chrome and log in → press F12 → go to the **Network tab** (not "view source") → refresh → click the top request of type *document* → under **Request Headers**, copy the entire `cookie:` line's value → paste it back to me.
+  Then `set_cookie(domain, cookie)` and resume where you stopped.
+- Expiry expectations: Canvas cookies last days; Shibboleth/SSO cookies on professor sites last hours. A mid-collection SSO bounce means re-ask, not retry.
+- A cookie is a credential: it goes into `set_cookie` and nowhere else — no file you produce, no chat echo, no logs.
+
+Known LMS terrain (saves an hour of 401s):
+- Courses often close the **Files** tab to students → walk **Modules** or **Assignments**; a module file item's API URL must be GET'd once more for the real download `.url`.
+- Professor sites carry the real content more often than Canvas. Google Docs export via `…/export?format=pdf`.
+- Recordings (Panopto/Zoom) sit behind LTI — unreachable; they stay hyperlinks.
+
+## 资料 — the materials store
+
+**Download everything reachable that the batch references — Canvas AND professor-site files.** A link is only acceptable where a download is impossible: SSO walls you lack a cookie for, videos, submission portals.
+
+- Naming: `<course>_<Category><NN?>_<Name?>.<ext>`. Categories: HW, Assign, Slides, SlidesAll, Notes, Setup, Lab, Syllabus, PracticeMidterm, FinalProject. Examples: `270_HW1.pdf`, `350_Slides01_Intro.pdf`, `270_Notes_TransmissionLines.pdf`, `371_Assign0_notebook.ipynb`, `350_SlidesAll_Spring2024.pdf`.
+- **Quarantine rule**: download to a temp dir → verify (MIME matches, PDF tail has `%%EOF`, size matches Content-Length — MCP `download` enforces length) → only then copy into 资料. Never redownload over a good file unverified: a truncated PDF opens blank, and a login page saved as `.pdf` is worse.
+
+## todo.md — the format contract
+
+New batch prepends directly under `# TODO` (newest first). Shape:
 
 ```markdown
 # TODO
@@ -59,18 +81,18 @@ Cumulative: each request appends a new batch section under the single `# TODO` t
   - [assignment](资料/371_Assign0.html) + [notebook template](资料/371_Assign0_notebook.ipynb): set up Python/Jupyter and do a few short prereq self-check problems; submit the notebook + PDF pair
 ```
 
-Hard rules (each exists because a user demanded it):
+Line grammar — deviate from none of these (each rule exists because a user demanded it):
 
-- **Full natural English. Never invent shorthand** — no telegraph style like `五 8/28 5pm · 270 HW1`, no arrow chains, no made-up labels. Complete short sentences.
-- Batch header is `## Before <M/D>` — nothing else, no "Batch 1", no preamble line under `# TODO`.
-- Two sections per batch: `### Study`, `### Submit`. One checkbox per item.
-- Study lines: `<course>: <verb> [<material>](资料/<file> or url)< — why it matters, few words>`. Only material that **directly helps this batch's assignments/quizzes/deliverables**. No "preview next week", no general enrichment.
-- Submit lines: **course + item first**, destination as a link, **deadline in 【】 last**: `270 HW1 → [Gradescope](url) 【Fri 8/28, 5pm】`. Flag AM deadlines loudly (`11:59 **AM** — noon, not midnight`).
-- Each real assignment gets ONE indented sub-bullet: link to the local copy + a one-line content breakdown (problem count, points, topics).
-- The file is an outward deliverable, not a scratchpad: **no meta notes, no access caveats, no attendance-only events** (a lab where nothing is submitted is said in chat, not written into the file). Deadlines already order the work — no schedule-suggestion prose.
-- Hyperlinks: local materials as `[name](资料/file.pdf)` relative links; videos, submission portals, and anything not downloadable as normal web links.
-- When unsure whether something belongs in the file, ask the user instead of adding it.
+- **Study**: `<course>: <verb> [<material>](资料/file-or-url) — <why it matters, a few words>`. Admit ONLY material that directly serves this batch's assignments/quizzes. No lecture previews, no enrichment, no "worth knowing".
+- **Submit**: `<course> <item> → [<portal>](url) 【<Day M/D, time>】` — work first, deadline last, always in 【】. AM deadlines get flagged loudly: `11:59 **AM** — noon, not midnight`.
+- One indented sub-bullet per real assignment: local link + one-line breakdown (problems, points, topics) — enough to size the work without opening it.
+- Full natural English in complete short sentences. **Never invent shorthand**: no telegraph lines (`五 8/28 5pm · 270 HW1`), no arrow chains, no codenames.
+- No preamble, no "Batch N", no schedule-suggestion prose — deadlines already order the work.
+- The file is an outward deliverable, not your scratchpad: no meta notes, no access caveats, no attendance-only events. All of that goes to chat.
+- Unsure whether something belongs in the file? Ask. Don't pad.
 
-## Chat conduct
+## Never
 
-Say in chat (never in the file): attendance reminders, access limitations, what could not be downloaded and why, and the cookie re-grab instructions when needed. Report what was downloaded with page counts/sizes so the user can spot a bad file.
+- Never rewrite or reorder previous batches, or touch their checkboxes.
+- Never put a credential, a caveat, or your process narration into any file in the vault.
+- Never link a local file you haven't verified, or ship a batch with a deadline you haven't seen at its source.
