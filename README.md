@@ -1,10 +1,19 @@
 # course-todo
 
-A Claude Code plugin that keeps a **cumulative course to-do list** (`todo.md`) in your Obsidian vault, built from Canvas LMS and professor course sites. Every batch you request, it:
+One Claude Code plugin for an Obsidian course workspace, with a shared materials opening and two referenced output workflows:
 
-- pulls assignments, due dates, readings, and files from Canvas (and public professor sites),
-- **downloads every reachable PDF** into a `资料/` materials folder (integrity-verified — no silent half-downloads),
-- appends a clean, ADHD-friendly `## Before <date>` batch to `todo.md`: a **Study** list (only what directly helps this batch's work) and a **Submit** list (`270 HW1 → [Gradescope](…) 【Fri 8/28, 5pm】`), with local links to the downloaded materials.
+```text
+Obsidian folder + course context + existing materials
+                     │
+       readiness / requested Canvas collection
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+       todo.md             textbook.md
+  deadlines + checkboxes   lecture-based teaching
+```
+
+The parent skill keeps its existing `course-todo` name. No second repository or separately maintained Canvas authentication is needed.
 
 ## Install
 
@@ -13,26 +22,36 @@ A Claude Code plugin that keeps a **cumulative course to-do list** (`todo.md`) i
 /plugin install course-todo@atomiiw
 ```
 
-Requires Node.js (the bundled MCP server is a single zero-dependency `.mjs` file).
+Requires Node.js for the bundled zero-dependency Canvas MCP.
 
 ## Use
 
-> update my course todo through 9/3 — vault folder is ~/Documents/Obsidian Vault/My Semester
+**Todo:** “Update my course todo through 9/25 — the folder is …”
 
-Give it: your Obsidian folder, and the end date of the range. Keep a course-overview note in that folder (course numbers, Canvas course ids, Gradescope links, schedule) — the skill reads it as its map. Each new request appends a new batch; old batches and their checkboxes are never touched.
+Uses the overview to locate courses and submission portals, verifies live deadlines, downloads referenced materials, and adds a cumulative Study/Submit batch without changing previous checkboxes.
+
+**Textbook:** “Generate the next ECE 270 textbook from the files in this Obsidian folder, through Lecture 7.”
+
+Consumes one course's existing lectures, readings, figures, homework, and previous chapters. If essential inputs are missing, it asks for them; it does not automatically resync Canvas. Output uses the original blue professor-note / green explanation callouts, lecture groups, and numbered study bites. Teaching follows the steps leading to the professor's equations and explains their implications. Homework privately prioritizes coverage; questions and solutions do not appear in the textbook. Earlier chapters are referenced instead of retaught.
+
+**Collect, then write:** “Download the latest ECE 270 materials into 资料, then generate the next textbook.”
+
+Runs the shared collection first, verifies files, then hands them to the textbook workflow. If both a todo and a textbook are requested, they reuse the collected materials.
 
 ## Authentication
 
-Your school probably disables student API tokens, so the bundled `canvas` MCP server authenticates with **your own browser session cookies**. Nothing is stored anywhere except `~/.canvas-mcp/cookies/` on your machine (mode 600), and access is read-only. When a cookie is missing or expired, Claude walks you through copying it out of your browser's DevTools Network tab and saves it via the `set_cookie` tool. Canvas cookies last days; Shibboleth/SSO cookies for professor sites last hours.
+The shared Canvas MCP uses the user's browser session cookie stored locally under `~/.canvas-mcp/cookies/`. Use stored cookies first unless the user requests otherwise. When missing/expired, guide the user through Chrome DevTools → Network → refresh → document request → Request Headers → cookie value, then use `set_cookie`. Credentials never belong in artifacts or this repository. Canvas operations are read-only; downloads and cookie storage are local writes.
 
-Not at Duke? Set your Canvas host once:
+For other schools, set `CANVAS_HOST` in the MCP environment.
 
-```json
-// in the plugin's mcpServers config or your environment
-"env": { "CANVAS_HOST": "canvas.yourschool.edu" }
-```
+## Structure
 
-## What's inside
+- `skills/course-todo/SKILL.md` — parent/router and shared opening
+- `skills/course-todo/references/materials.md` — course mapping, scoped collection, cookie auth, download integrity
+- `skills/course-todo/references/todo.md` — deadline channels, cumulative todo contract
+- `skills/course-todo/references/textbook.md` — input/output boundary, teaching process, verification
+- `skills/course-todo/references/textbook-style.md` — retained original structure and heading voice
+- `skills/course-todo/assets/textbook-template.md` — native reusable Obsidian scaffold
+- `mcp/canvas-mcp.mjs` — existing shared Canvas tools, unchanged
 
-- `skills/course-todo/SKILL.md` — the workflow + exact file layout, naming scheme, and todo format rules
-- `mcp/canvas-mcp.mjs` — zero-dependency stdio MCP server: `set_cookie`, `which_cookies`, `download` (length-verified), `fetch`, and Canvas helpers (`list_courses`, `course_tabs`, `list_folders`, `list_files`, `list_assignments`, `announcements`, `list_pages`, `get_page`, `api_get`)
+Personal course PDFs, textbook pictures, generated chapters, and credentials are not bundled. They stay in the user's Obsidian folder.
