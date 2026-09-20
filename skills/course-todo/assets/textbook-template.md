@@ -14,7 +14,7 @@ This textbook follows the professor's **Lecture {{sequence}}** sequence, connect
 
 Coverage: {{verified lecture pages and relevant clarification}}.
 
-**For today's work:** Read one numbered section at a time. Each section follows one learning goal for an approximately 30-minute study block. {{Only necessary links to previously established results; no homework map.}}
+**For today's work:** Each numbered section follows one learning goal. Step labels such as 6.2 mean section 6, step 2, so you can refer to a precise equation or transition when discussing it with ChatGPT. Take the time you need. {{Only necessary links to previously established results; no homework map.}}
 
 ## Lecture {{N}} · {{Natural explanatory theme in the original voice}}
 
@@ -30,7 +30,11 @@ Coverage: {{verified lecture pages and relevant clarification}}.
 >
 > **Definition — {{genuinely new term}}:** {{Meaning; new symbols and units. Omit when there is no new term.}}
 >
-> {{Walk from the established starting relation to the target: intermediate equation → brief justification → next equation. Include the relevant textbook figure and connect its labels to the step when useful.}}
+> **Step {{section}}.1 · {{First meaningful operation or claim}}**
+> {{Starting relation → intermediate equation, with a short reason and needed local notation.}}
+>
+> **Step {{section}}.2 · {{Next meaningful operation or claim}}**
+> {{Next equation and why it follows. Add only as many numbered steps as the derivation needs. Connect relevant textbook figure labels to the step when useful.}}
 >
 > {{Explain the final equation's physical meaning, applicable conditions, and essential sign/limit/implication. No homework question, worked answer, or unrelated extension.}}
 

@@ -35,4 +35,4 @@ Brief source/coverage introduction in the original voice.
 Relative links to actual local materials, page references, verified corrections.
 ```
 
-These original heading examples illustrate voice, not mandatory topics. Retain blue note/green tip callouts, lecture order, numbered approximately 30-minute bites, English prose, and purpose-bearing titles. Replace only subject matter and course metadata. The original homework walkthroughs are explicitly excluded under the later user preference. Do not reproduce homework text in the new textbook.
+These original heading examples illustrate voice, not mandatory topics. Retain blue note/green tip callouts, lecture order, numbered sections with one coherent learning goal and referenceable derivation steps, English prose, and purpose-bearing titles. Replace only subject matter and course metadata. The original homework walkthroughs are explicitly excluded under the later user preference. Do not reproduce homework text in the new textbook.

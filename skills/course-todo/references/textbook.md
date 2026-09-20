@@ -18,7 +18,7 @@ Read the course’s existing tailored textbook, especially the original HW1–3 
 
 - Preserve the original frontmatter structure, CSS class, title pattern `# {course} · From Lecture Notes to {scope}`, and `{term} / Prepared for Atom / {date}` byline. For ECE 270 keep `ece270-study`; for another course inherit its existing style if supplied, otherwise preserve this reference styling. Do not edit vault CSS.
 - H2 groups: `Lecture N · ...`, in professor lecture order. H3: continuously numbered natural explanatory headings, matching the original voice. Explain what is being found, shown, or understood rather than giving bare topic names.
-- Each H3 is one coherent approximately 30-minute digestible study bite. This includes understanding the reasoning, not just reading. Split genuinely different goals; do not pad with exercises or repeat material to fill time.
+- Each H3 follows one coherent learning goal. Scope a bite by conceptual completeness, not a fixed reading or study duration. Split genuinely different goals; allow the reader to spend as long as needed discussing a step.
 - Blue: `> [!note] Professor's notes · Lx p.y` (or a page range). Faithful organized lecture content and the professor's progression toward the final equation. Do not attribute added derivations to the professor.
 - Green: `> [!tip] Explanation · ...`. Explain missing steps, genuinely new definitions, textbook-supported intuition and figures, conditions, and implications.
 - Preserve the existing note/tip colors, blue/green ordering, quote prefixes, math syntax, and relative image/PDF links. Keep continuation lines, tables, equations, and figures inside the intended callout. Do not replace these with a new card system, heading taxonomy, or collapsed answer blocks.
@@ -49,11 +49,20 @@ Each bite should make the reader able to explain **what the professor is trying 
 - Distinguish source-faithful content from added explanations through the blue/green blocks. Resolve material source errors using the equations and boundary conditions and flag corrections briefly.
 - No problem statements, solutions, numerical checkpoints, homework navigation tables, extra exercises, or second homework-reading pass unless independently requested.
 
+## Support learning through conversation
+
+Atom uses the textbook alongside ChatGPT as part of learning. Make the text a reliable shared reference for that discussion; do not treat needing a second explanation as failure or prescribe a pace based on classroom duration.
+
+- Give meaningful derivation steps unique, visible labels such as **Step 6.2 · Select the largest and smallest cosine values** (section.step). Keep the existing H3 and callout hierarchy. A user should be able to identify exactly where they are stuck.
+- Keep each step's equation, short justification, and needed local notation together. Briefly recall a symbol's role when the section would otherwise require searching backward; link to earlier conceptual explanations instead of repeating them.
+- Let the title and opening establish one clear goal, and the ending explain what the resulting equation means. Avoid redundant goal labels when the existing opening already does this.
+- A short introduction may explain the step labels. Do not add mandatory ChatGPT prompt packs, exercises, comprehension gates, or time estimates.
+
 ## Authoring and verification
 
 1. Read the live folder and previous chapters; determine the one course and scope. Ask narrowly for missing essential materials. Do not search other courses to fill gaps.
 2. Inspect handwritten source pages and relevant figures visually; text extraction alone does not establish diagram topology or equation signs.
 3. Draft using the exact reference structure. Check coverage against the private equation/homework map. Check for repeated teaching against prior chapters.
-4. For each bite, verify that the final equation is reached by a readable chain of justified steps and that its meaning is explained. Remove content that serves neither the lecture's target nor a needed conceptual gap.
+4. For each bite, verify that the final equation is reached by a readable chain of justified steps and that its meaning is explained. Check that the reader can cite a specific step and find the notation and reason needed to discuss it. Remove content that serves neither the lecture's target nor a needed conceptual gap.
 5. Check callout structure, math, source page references, figure labels, relative links, and saved file integrity. Inspect rendered figures and a rendered note when available; distinguish structural checks from actual visual inspection in any report.
 6. Save beside the existing textbook (or the course's specified output folder), with necessary figure assets. Leave other chapters, source files, todo entries, and styling unchanged. Return a concise note link.
