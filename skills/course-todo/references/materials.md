@@ -27,4 +27,3 @@ Known LMS terrain (saves an hour of 401s):
 
 - Naming: `<course>_<Category><NN?>_<Name?>.<ext>`. Categories: HW, Assign, Slides, SlidesAll, Notes, Setup, Lab, Syllabus, PracticeMidterm, FinalProject. Examples: `270_HW1.pdf`, `350_Slides01_Intro.pdf`, `270_Notes_TransmissionLines.pdf`, `371_Assign0_notebook.ipynb`, `350_SlidesAll_Spring2024.pdf`.
 - **Quarantine rule**: download to a temp dir → verify (MIME matches, PDF tail has `%%EOF`, size matches Content-Length — MCP `download` enforces length) → only then copy into 资料. Never redownload over a good file unverified: a truncated PDF opens blank, and a login page saved as `.pdf` is worse.
-
