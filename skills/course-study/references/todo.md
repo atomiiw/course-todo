@@ -1,8 +1,3 @@
----
-name: course-todo
-description: Turn Canvas + professor course sites into a cumulative, ADHD-friendly todo.md inside an Obsidian folder, with every reachable course file downloaded, verified, and locally linked. Use when the user asks to update their course todo, plan schoolwork through a date, or collect course materials. Inputs: the Obsidian folder and the end date of the range.
----
-
 # Course Todo
 
 You maintain one deliverable for a student who skips lectures: open `todo.md`, and everything needed to survive the next deadline window is one click away — the assignment, the exact material that teaches it, and where to submit. No LMS spelunking, no dead links, no half-downloaded PDFs.
@@ -23,7 +18,7 @@ Ship only when ALL hold — otherwise say what's missing in chat:
 3. Every `[name](资料/…)` link resolves to a file that passed integrity checks.
 4. Anything that could not be fetched is reported in chat with the reason — never silently dropped, never written into the file as a caveat.
 
-## Inputs — settle before touching anything
+## Todo-specific inputs
 
 - **Obsidian folder** (absolute path). It must contain a course-overview note (course numbers, LMS course ids, submission-portal links, schedule). That note is the map: read it first, trust it for *where things are submitted*; trust the live LMS for *what is due when*. No overview note → ask the user for one; do not guess course ids.
 - **End date** — the new batch covers today through that date.
@@ -39,31 +34,9 @@ Ship only when ALL hold — otherwise say what's missing in chat:
    - `announcements` — a prof pushing a date change or dropping a file on a whim
    - `fetch` the professor site — courses with no Canvas assignments (submission on Gradescope) post the real schedule here
    Anything with a `due_at`/`lock_at` inside the window goes into Submit. Not covered by any API — Gradescope, Ed/Piazza, Slack, and anything said aloud in a lecture: name them in the chat report so the user checks them manually.
-3. **Collect** (rules under 资料 below): download every file a batch item references.
+3. **Collect**: use the shared [materials workflow](materials.md) to download and verify every referenced file.
 4. **Write**: append the batch to `todo.md` per the format contract below.
 5. **Report** in chat: what was downloaded (sizes/page counts, so a bad file is spottable), what wasn't and why, plus anything that belongs in chat instead of the file (attendance-only events, upcoming cookie expiry).
-
-## Auth playbook
-
-The bundled `canvas` MCP authenticates with the user's own browser session cookies (`set_cookie(domain?, cookie)`, stored under `~/.canvas-mcp/cookies/`, mode 600, read-only access). Non-Duke schools: set `CANVAS_HOST`.
-
-- **Never ask for a cookie preemptively.** Use stored cookies; only when a tool errors "cookie missing/expired for <host>" do you deliver this script, verbatim:
-  > Open the page in Chrome and log in → press F12 → go to the **Network tab** (not "view source") → refresh → click the top request of type *document* → under **Request Headers**, copy the entire `cookie:` line's value → paste it back to me.
-  Then `set_cookie(domain, cookie)` and resume where you stopped.
-- Expiry expectations: Canvas cookies last days; Shibboleth/SSO cookies on professor sites last hours. A mid-collection SSO bounce means re-ask, not retry.
-- A cookie is a credential: it goes into `set_cookie` and nowhere else — no file you produce, no chat echo, no logs.
-
-Known LMS terrain (saves an hour of 401s):
-- Courses often close the **Files** tab to students → walk **Modules** or **Assignments**; a module file item's API URL must be GET'd once more for the real download `.url`.
-- Professor sites carry the real content more often than Canvas. Google Docs export via `…/export?format=pdf`.
-- Recordings (Panopto/Zoom) sit behind LTI — unreachable; they stay hyperlinks.
-
-## 资料 — the materials store
-
-**Download everything reachable that the batch references — Canvas AND professor-site files.** A link is only acceptable where a download is impossible: SSO walls you lack a cookie for, videos, submission portals.
-
-- Naming: `<course>_<Category><NN?>_<Name?>.<ext>`. Categories: HW, Assign, Slides, SlidesAll, Notes, Setup, Lab, Syllabus, PracticeMidterm, FinalProject. Examples: `270_HW1.pdf`, `350_Slides01_Intro.pdf`, `270_Notes_TransmissionLines.pdf`, `371_Assign0_notebook.ipynb`, `350_SlidesAll_Spring2024.pdf`.
-- **Quarantine rule**: download to a temp dir → verify (MIME matches, PDF tail has `%%EOF`, size matches Content-Length — MCP `download` enforces length) → only then copy into 资料. Never redownload over a good file unverified: a truncated PDF opens blank, and a login page saved as `.pdf` is worse.
 
 ## todo.md — the format contract
 

@@ -1,12 +1,17 @@
 {
   "name": "course-todo",
-  "version": "1.1.0",
-  "description": "Cumulative course to-do list in your Obsidian vault, built from Canvas and professor course sites — downloads every reachable PDF into a materials folder and links it. Ships a cookie-auth read-only Canvas MCP server.",
-  "author": { "name": "atomiiw", "url": "https://github.com/atomiiw" },
+  "version": "1.3.0",
+  "description": "Shared Obsidian course-material workflow with cumulative todo and tailored textbook outputs, plus a cookie-authenticated read-only Canvas MCP.",
+  "author": {
+    "name": "atomiiw",
+    "url": "https://github.com/atomiiw"
+  },
   "mcpServers": {
     "canvas": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/canvas-mcp.mjs"]
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/mcp/canvas-mcp.mjs"
+      ]
     }
   }
 }
