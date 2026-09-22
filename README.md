@@ -1,4 +1,4 @@
-# course-todo
+# Course Study — todos and tailored textbooks
 
 One Claude Code plugin for an Obsidian course workspace, with a shared materials opening and two referenced output workflows:
 
@@ -13,7 +13,7 @@ Obsidian folder + course context + existing materials
   deadlines + checkboxes   lecture-based teaching
 ```
 
-The parent skill keeps its existing `course-todo` name. No second repository or separately maintained Canvas authentication is needed.
+The single skill is named `course-study`, with todo and textbook functions under the same shared materials opening. The repository and plugin retain `course-todo` for the existing installation address. No second skill or repository is needed.
 
 ## Install
 
@@ -46,12 +46,12 @@ For other schools, set `CANVAS_HOST` in the MCP environment.
 
 ## Structure
 
-- `skills/course-todo/SKILL.md` — parent/router and shared opening
-- `skills/course-todo/references/materials.md` — course mapping, scoped collection, cookie auth, download integrity
-- `skills/course-todo/references/todo.md` — deadline channels, cumulative todo contract
-- `skills/course-todo/references/textbook.md` — input/output boundary, teaching process, verification
-- `skills/course-todo/references/textbook-style.md` — retained original structure and heading voice
-- `skills/course-todo/assets/textbook-template.md` — native reusable Obsidian scaffold
+- `skills/course-study/SKILL.md` — parent/router and shared opening
+- `skills/course-study/references/materials.md` — course mapping, scoped collection, cookie auth, download integrity
+- `skills/course-study/references/todo.md` — deadline channels, cumulative todo contract
+- `skills/course-study/references/textbook.md` — input/output boundary, teaching process, verification
+- `skills/course-study/references/textbook-style.md` — retained original structure and heading voice
+- `skills/course-study/assets/textbook-template.md` — native reusable Obsidian scaffold
 - `mcp/canvas-mcp.mjs` — existing shared Canvas tools, unchanged
 
 Personal course PDFs, textbook pictures, generated chapters, and credentials are not bundled. They stay in the user's Obsidian folder.

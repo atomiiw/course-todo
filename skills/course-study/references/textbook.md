@@ -2,7 +2,7 @@
 
 ## Contract and boundary
 
-This is the textbook-output sibling of `course-todo`, not a course-sync or homework-solving skill.
+This is the textbook-output function of `course-study`, not a course-sync or homework-solving skill.
 
 **Input:** an Obsidian folder containing materials for one identified course: professor lecture notes, relevant textbook/readings and figures, homework for internal prioritization, and previous tailored chapters when available. The request or files must identify the target lecture/chapter range.
 

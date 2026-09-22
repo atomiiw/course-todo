@@ -1,11 +1,11 @@
 ---
-name: course-todo
+name: course-study
 description: Use a shared Obsidian course-material opening, then create either cumulative course todos or a lecture-based tailored textbook. Route todo requests to live deadline planning and textbook requests to one course's existing materials, preserving the blue/green teaching template. Collect Canvas materials only as needed by the requested workflow.
 ---
 
 # Course workspace
 
-One parent skill, one materials opening, two output workflows. Keep the `course-todo` name for existing installations and invocations.
+One skill with a shared materials opening and two referenced functions: course todos and tailored textbooks.
 
 ## Shared opening
 
